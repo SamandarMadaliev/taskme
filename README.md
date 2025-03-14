@@ -39,6 +39,12 @@ Refer to `.env.example` for all configurable environment variables required to r
 ## Deployment
 To be determined. (Let me know if you need help with this!)
 
+## Testing
+To initiate the test, ensure the docker containers are running as instructed earlier. Then, execute the command within the backend container.
+```sh 
+php artisan test
+```
+
 ## Contributing
 This is a simple project. Contributions and improvements are welcome!
 
