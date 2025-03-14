@@ -22,24 +22,21 @@ class AuthController extends Controller
 
     public function register(Request $request): JsonResponse
     {
-        $validate = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|min:6|confirmed',
-        ]);
-        if ($validate->fails()) {
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|min:6|confirmed',
+            ]);
+        } catch (\Exception $e) {
             return response()->json(
                 [
-                    'error' => $validate->errors()
+                    'error' => 'Invalid credentials',
                 ],
                 Response::HTTP_BAD_REQUEST
             );
         }
-        $user = $this->userRepository->create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => Hash::make($request->input('password')),
-        ]);
+        $user = $this->userRepository->create($validatedData);
         $token = $user->createToken($user->email);
         return response()->json([
             'name' => $user->name,
@@ -51,14 +48,15 @@ class AuthController extends Controller
 
     public function login(Request $request): JsonResponse
     {
-        $validate = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users',
-            'password' => 'required|min:6',
-        ]);
-        if ($validate->fails()) {
+        try {
+            $request->validate([
+                'email' => 'required|email|exists:users',
+                'password' => 'required|min:6',
+            ]);
+        } catch (\Exception $e) {
             return response()->json(
                 [
-                    'error' => $validate->errors()
+                    'error' => 'Invalid credentials',
                 ],
                 Response::HTTP_BAD_REQUEST
             );

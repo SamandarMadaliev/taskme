@@ -123,4 +123,9 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /**
+     * Pagination max and min limitations
+     */
+    'pagination_max_limit' => 500,
+    'pagination_min_limit' => 1,
 ];
