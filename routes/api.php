@@ -14,6 +14,6 @@ Route::post('/logout', [AuthController::class, 'logout'])
 // Tasks routes
 Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
     Route::apiResource('/tasks', TaskController::class);
-    Route::post('/tasks/{task}/complete', [TaskController::class, 'complete'])
+    Route::put('/tasks/{task}/complete', [TaskController::class, 'complete'])
         ->name('tasks.complete');
 });

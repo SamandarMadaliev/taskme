@@ -8,7 +8,6 @@ use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
@@ -42,7 +41,6 @@ class AuthController extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'token' => $token->plainTextToken,
-            'created_at' => $user->created_at,
         ]);
     }
 

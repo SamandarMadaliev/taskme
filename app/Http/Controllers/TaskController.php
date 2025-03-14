@@ -11,8 +11,10 @@ use App\Rules\QuerySortValidator;
 use App\Rules\QueryStatusValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -28,6 +30,7 @@ class TaskController extends Controller
 
     /**
      * Display a listing of the resource.
+     * @throws ValidationException
      */
     public function index(Request $request): JsonResponse
     {
@@ -39,12 +42,14 @@ class TaskController extends Controller
             $limit = config('app.pagination_max_limit');
         }
 
-        $request->validate([
+        // Validate status and sort
+        Validator::make($request->query(), [
             'status' => [new QueryStatusValidator()],
-        ]);
-        $request->validate([
+        ])->validate();
+        Validator::make($request->query(), [
             'sort' => [new QuerySortValidator()],
-        ]);
+        ])->validate();
+
         $sort = $request->query('sort');
         $status = $request->query('status');
 
@@ -99,11 +104,14 @@ class TaskController extends Controller
             );
         }
 
-        $validatedData['user_id'] = Auth::user()->id;
-        $this->taskRepository->createTask($validatedData);
+        $validatedData['user_id'] = auth()->id();
+        $task = $this->taskRepository->createTask($validatedData);
 
         return response()->json(
-            ['message' => 'Task created'],
+            [
+                'message' => 'Task created',
+                'task' => $task,
+            ],
             Response::HTTP_CREATED,
         );
     }
@@ -153,10 +161,13 @@ class TaskController extends Controller
             );
         }
         $userId = auth()->id();
-        $updatedRows = $this->taskRepository->updateTask((int)$id, $userId, $validatedData);
+        $task = $this->taskRepository->updateTask((int)$id, $userId, $validatedData);
 
         return response()->json(
-            ['message' => sprintf('%d rows affected', $updatedRows)],
+            [
+                'message' => 'Task updated',
+                'task' => $task,
+            ],
         );
     }
 

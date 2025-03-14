@@ -46,18 +46,21 @@ class TaskRepository implements TaskRepositoryInterface
             ->first();
     }
 
-    public function createTask(array $data): bool
+    public function createTask(array $data): Task
     {
-        $this->taskModel->fill($data);
-        return $this->taskModel->save();
+        return $this->taskModel::create($data);
     }
 
-    public function updateTask(int $id, int $userId, array $data): int
+    public function updateTask(int $id, int $userId, array $data): ?Task
     {
-        return $this->taskModel::query()
-            ->where('id', '=', $id)
+        // Getting the task
+        $task = $this->taskModel::where('id', '=', $id)
             ->where('user_id', '=', $userId)
-            ->update($data);
+            ->firstOrFail();
+        // Updating the task by given data
+        $task->update($data);
+        // Returning the task back
+        return $task;
     }
 
     public function deleteTask(int $id, int $userId): void

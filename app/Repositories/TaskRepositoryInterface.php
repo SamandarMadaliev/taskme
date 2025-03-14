@@ -17,9 +17,9 @@ interface TaskRepositoryInterface
 
     public function getTaskById(int $id): ?Task;
 
-    public function createTask(array $data): bool;
+    public function createTask(array $data): Task;
 
-    public function updateTask(int $id, int $userId, array $data): int;
+    public function updateTask(int $id, int $userId, array $data): ?Task;
 
     public function deleteTask(int $id, int $userId): void;
 

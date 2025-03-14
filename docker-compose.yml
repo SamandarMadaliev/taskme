@@ -59,19 +59,16 @@ services:
         networks:
             - network_taskme
 
-    ngrok:
-        image: ngrok/ngrok:latest
-        container_name: ngrok_taskme
-        restart: unless-stopped
+    swagger-ui:
+        image: swaggerapi/swagger-ui
         ports:
-            - "4040:4040"
-        environment:
-            NGROK_AUTHTOKEN: ${NGROK_TOKEN}
-        command: http --url=${APP_BASE_DOMAIN} nginx:9090
-        depends_on:
-            - nginx
+            - "8080:8080"
         networks:
             - network_taskme
+        environment:
+            SWAGGER_JSON_URL: "/docs/openapi.yaml"
+        volumes:
+            - ./docs/openapi.yaml:/usr/share/nginx/html/docs/openapi.yaml
 
 networks:
     network_taskme:
