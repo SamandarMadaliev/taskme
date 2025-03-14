@@ -100,29 +100,62 @@ paths:
             example: 25
             maximum: 500
             minimum: 1
-        - name: status
+        - name: status[]
           in: query
           description: Filter tasks by status (e.g., pending, completed)
           required: false
           schema:
             type: array
-            example: "pending"
-            enum:
-              - 'pending'
+            items:
+              type: string
+              enum:
+                - 'pending'
+                - 'in_progress'
+            example:
               - 'in_progress'
-              - 'completed'
-              - 'archived'
-        - name: priority
+              - 'pending'
+        - name: sort[created_at]
           in: query
-          description: Filter tasks by priority (e.g., low, medium, high)
+          description: (Optional) Sort by creation date (asc/desc)
           required: false
           schema:
             type: string
-            example: "medium"
             enum:
-              - low
-              - medium
-              - high
+              - 'asc'
+              - 'desc'
+            example: 'desc'
+        - name: sort[status]
+          in: query
+          description: (Optional) Sort by status (asc/desc)
+          required: false
+          schema:
+            type: string
+            enum:
+              - 'asc'
+              - 'desc'
+            example: 'asc'
+
+        - name: sort[priority]
+          in: query
+          description: (Optional) Sort by priority (asc/desc)
+          required: false
+          schema:
+            type: string
+            enum:
+              - 'asc'
+              - 'desc'
+            example: 'asc'
+
+        - name: sort[due_date]
+          in: query
+          description: (Optional) Sort by due date (asc/desc)
+          required: false
+          schema:
+            type: string
+            enum:
+              - 'asc'
+              - 'desc'
+            example: 'desc'
       responses:
         "200":
           description: Successful response
@@ -228,7 +261,7 @@ paths:
                 properties:
                   message:
                     example: Task deleted
-  /tasks/{task}/complete:
+  /tasks/{id}/complete:
     put:
       summary: Complete a task by id
       operationId: completeTask
