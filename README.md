@@ -12,7 +12,7 @@ TaskMe is a simple task management system that allows users to create, read, upd
 1. Clone the repository:
    ```sh
    git clone git@github.com:SamandarMadaliev/taskme.git
-   cd TaskMe
+   cd taskme
    ```
 2. Copy the environment file:
    ```sh
