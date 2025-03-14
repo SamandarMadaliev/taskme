@@ -11,7 +11,7 @@ TaskMe is a simple task management system that allows users to create, read, upd
 ## Installation
 1. Clone the repository:
    ```sh
-   git clone <repository-url>
+   git clone git@github.com:SamandarMadaliev/taskme.git
    cd TaskMe
    ```
 2. Copy the environment file:
@@ -25,6 +25,7 @@ TaskMe is a simple task management system that allows users to create, read, upd
 
 
 ## Usage
+- After successfully launching docker containers, requests could be sent to `localhost:9090` 
 - The application provides full CRUD operations for managing tasks.
 - API endpoints are documented in the `docs/openapi.yml` file.
 - Configure environment variables in the `.env` file.
