@@ -1,0 +1,477 @@
+openapi: 3.0.0
+info:
+  title: TaskMe API
+  description: API Documentation for the TaskMe project
+  version: 1.0.0
+  contact:
+    email: example@mail.com
+
+servers:
+  - url: http://localhost:9090/api
+    description: Local API Server
+
+paths:
+  /register:
+    post:
+      summary: Register to the system
+      operationId: registerUser
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+  /login:
+    post:
+      summary: Login to the system
+      operationId: loginUser
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: john@gmail.com
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+  /logout:
+    post:
+      summary: Logout from system
+      operationId: logoutUser
+      tags:
+        - Auth
+      security:
+        - BearerAuth: [ ]
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logged out
+  /tasks:
+    get:
+      summary: Get all tasks
+      operationId: getTasks
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          description: The page number to retrieve
+          required: false
+          schema:
+            type: integer
+            example: 1
+            minimum: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            example: 25
+            maximum: 500
+            minimum: 1
+        - name: status[]
+          in: query
+          description: Filter tasks by status (e.g., pending, completed)
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - 'pending'
+                - 'in_progress'
+            example:
+              - 'in_progress'
+              - 'pending'
+        - name: sort[created_at]
+          in: query
+          description: (Optional) Sort by creation date (asc/desc)
+          required: false
+          schema:
+            type: string
+            enum:
+              - 'asc'
+              - 'desc'
+            example: 'desc'
+        - name: sort[status]
+          in: query
+          description: (Optional) Sort by status (asc/desc)
+          required: false
+          schema:
+            type: string
+            enum:
+              - 'asc'
+              - 'desc'
+            example: 'asc'
+
+        - name: sort[priority]
+          in: query
+          description: (Optional) Sort by priority (asc/desc)
+          required: false
+          schema:
+            type: string
+            enum:
+              - 'asc'
+              - 'desc'
+            example: 'asc'
+
+        - name: sort[due_date]
+          in: query
+          description: (Optional) Sort by due date (asc/desc)
+          required: false
+          schema:
+            type: string
+            enum:
+              - 'asc'
+              - 'desc'
+            example: 'desc'
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tasks"
+    post:
+      summary: Create a new task
+      operationId: createTask
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskRequest"
+      responses:
+        "201":
+          description: Task created
+  /tasks/{id}:
+    get:
+      summary: Get single task by id
+      operationId: getTask
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the task to retrieve
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+    put:
+      summary: Update a task by ID
+      operationId: updateTask
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the task to update
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Updated Title"
+      responses:
+        "200":
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Task updated"
+                  task:
+                    $ref: '#/components/schemas/Task'
+    delete:
+      summary: Delete a task by ID
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the task to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Task deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    example: Task deleted
+  /tasks/{id}/complete:
+    put:
+      summary: Complete a task by id
+      operationId: completeTask
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: The ID of a task to complete
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Changed the status of task to completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Task completed
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    AuthResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          example: John
+        email:
+          type: string
+          example: john@gmail.com
+        token:
+          type: string
+    Tasks:
+      type: object
+      properties:
+        tasks:
+          type: object
+          properties:
+            current_page:
+              type: integer
+              example: 1
+            data:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 5
+                  title:
+                    type: string
+                    example: "Updated Title"
+                  description:
+                    type: string
+                    example: "Test description"
+                  status:
+                    type: string
+                    example: "pending"
+                  priority:
+                    type: string
+                    example: "medium"
+                  due_date:
+                    type: string
+                    format: date-time
+                    example: "2025-03-14 20:00:00"
+                  created_at:
+                    type: string
+                    format: date-time
+                    example: "2025-03-14T08:22:44.000000Z"
+                  updated_at:
+                    type: string
+                    format: date-time
+                    example: "2025-03-14T08:23:23.000000Z"
+                  user_id:
+                    type: integer
+                    example: 5
+            first_page_url:
+              type: string
+              example: "http://localhost:9090/api/tasks?page=1"
+            from:
+              type: integer
+              example: 1
+            last_page:
+              type: integer
+              example: 1
+            last_page_url:
+              type: string
+              example: "http://localhost:9090/api/tasks?page=1"
+            links:
+              type: array
+              items:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    nullable: true
+                  label:
+                    type: string
+                  active:
+                    type: boolean
+            next_page_url:
+              type: string
+              nullable: true
+            path:
+              type: string
+              example: "http://localhost:9090/api/tasks"
+            per_page:
+              type: integer
+              example: 25
+            prev_page_url:
+              type: string
+              nullable: true
+            to:
+              type: integer
+              example: 1
+            total:
+              type: integer
+              example: 1
+    Task:
+      type: object
+      properties:
+        task:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 5
+            title:
+              type: string
+              example: "Updated Title"
+            description:
+              type: string
+              example: "Test description"
+            status:
+              type: string
+              example: "pending"
+            priority:
+              type: string
+              example: "medium"
+            due_date:
+              type: string
+              format: date-time
+              example: "2025-03-14 20:00:00"
+            created_at:
+              type: string
+              format: date-time
+              example: "2025-03-14T08:22:44.000000Z"
+            updated_at:
+              type: string
+              format: date-time
+              example: "2025-03-14T08:23:23.000000Z"
+            user_id:
+              type: integer
+              example: 5
+    TaskRequest:
+      type: object
+      required:
+        - title
+        - due_date
+      properties:
+        title:
+          type: string
+          example: "Test task"
+        description:
+          type: string
+          example: "Test task description"
+        status:
+          type: string
+          example: "in_progress"
+          enum:
+            - 'pending'
+            - 'in_progress'
+          default: 'pending'
+        priority:
+          type: string
+          example: 'medium'
+          enum:
+            - 'low'
+            - 'medium'
+            - 'high'
+          default: 'medium'
+        due_date:
+          type: string
+          example: '2025-04-15 00:00:00'
+          exclusiveMinimum: 'today'
+    RegisterRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+        - password_confirmation
+      properties:
+        name:
+          type: string
+          example: 'John'
+        email:
+          type: string
+          example: 'john@gmail.com'
+        password:
+          type: string
+        password_confirmation:
+          type: string
